@@ -1,11 +1,29 @@
 import readline from 'node:readline/promises';
 import {stdin, stdout} from 'node:process';
+import axios from "axios";
 
 const input = stdin;
 const output = stdout;
 const rl = readline.createInterface({input, output});
 
 const customers = [];
+
+async function getAddress(postalCode) {
+    /*
+        {
+            "cep": "89010025",
+            "state": "SC",
+            "city": "Blumenau",
+            "neighborhood": "Centro",
+            "street": "Rua Doutor Luiz de Freitas Melro",
+            ...
+        }
+     */
+    const {data: {cep, state, city, neighborhood, street}} =
+        await axios.get(`https://brasilapi.com.br/api/cep/v2/${postalCode}`);
+
+    return {cep, state, city, neighborhood, street};
+}
 
 async function listCustomers() {
     console.clear();
@@ -18,12 +36,15 @@ async function startRegistration() {
     console.clear();
 
     const name = await rl.question('Which is the customer name ? ');
-    const address = await rl.question('Which is the customer address ? ');
+
+    const postalCode = await rl.question('Which is the customer postal code? ? ');
+    const address = await getAddress(postalCode);
+
     const id = customers.length > 0
         ? customers[customers.length - 1].id + 1
         : 1;
 
-    customers.push({id, name, address});
+    customers.push({id, name, ...address});
 
     console.log(`Customer registered successfully.`);
 
