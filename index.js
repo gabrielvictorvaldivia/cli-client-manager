@@ -1,6 +1,7 @@
 import readline from 'node:readline/promises';
 import {stdin, stdout} from 'node:process';
 import axios from "axios";
+import {v1 as uuidv4} from 'uuid';
 
 const input = stdin;
 const output = stdout;
@@ -32,17 +33,28 @@ async function listCustomers() {
     runMenu()
 }
 
+async function askForPostalCode() {
+    while (true) {
+        const input = await rl.question('What is the customer postal code? ');
+        const postalCode = input.replace(/\D/g, "");
+
+        if (postalCode.length === 8) {
+            return postalCode;
+        }
+
+        console.log('Invalid postal code. Please enter exactly 8 digits.');
+    }
+}
+
 async function startRegistration() {
     console.clear();
 
+    const id = uuidv4();
+
     const name = await rl.question('Which is the customer name ? ');
 
-    const postalCode = await rl.question('Which is the customer postal code? ? ');
+    let postalCode = await askForPostalCode();
     const address = await getAddress(postalCode);
-
-    const id = customers.length > 0
-        ? customers[customers.length - 1].id + 1
-        : 1;
 
     customers.push({id, name, ...address});
 
