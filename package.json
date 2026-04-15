@@ -1,0 +1,17 @@
+{
+  "name": "cadastro-clientes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "crud",
+    "fs",
+    "nodejs"
+  ],
+  "author": "Gabriel Valdivia",
+  "license": "ISC",
+  "type": "module"
+}
