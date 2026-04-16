@@ -42,10 +42,21 @@ async function startRegistration() {
 
     const id = uuidv4();
 
-    const name = await promptInput('Which is the customer name ? ', "You must give a valid name.", nameValidator)
+    const name = await promptInput('Which is the customer name ? ', "You must give a valid name.", nameValidator);
+    // const personalPhone = await promptInput('Personal phone number ? ', "Invalid phone number.", (number)=> {
+    //     const regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    //     return regex.test(number)
+    // })
+    let address = undefined
 
-    const postalCode = await promptInput('What is the customer postal code? ', "Invalid postal code. Please enter exactly 8 digits.", postalCodeValidator);
-    const address = await getAddressByPostalCode(postalCode);
+    do {
+        try {
+            const postalCode = await promptInput('What is the customer postal code? ', "Invalid postal code. Please enter exactly 8 digits.", postalCodeValidator);
+            address = await getAddressByPostalCode(postalCode);
+        } catch (error) {
+            console.error(error.message)
+        }
+    } while (!address)
 
     customers.push({id, name, ...address});
 
