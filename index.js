@@ -32,8 +32,19 @@ async function promptInput(question, errorMessage, validatorCallback) {
 
 async function listCustomers() {
     console.clear();
-    console.log(customers);
-    await rl.question("Press 'Enter' to continue...")
+    console.log("Registered clients:\n");
+
+    const formatCep = (cep) =>
+        cep.replace(/^(\d{5})(\d{3})$/, "$1-$2");
+
+    for(let i=0; i<customers.length; i++) {
+        const customer = customers[i];
+        const address = `${customer.street}, ${customer.neighborhood}, ${customer.city} - ${customer.state}, CEP: ${formatCep(customer.cep)}`;
+
+        console.log(`${customer.name} | ${address}`)
+    }
+    console.log("\n")
+    await rl.question("Press 'Enter' to return...")
     runMenu()
 }
 
@@ -43,12 +54,8 @@ async function startRegistration() {
     const id = uuidv4();
 
     const name = await promptInput('Which is the customer name ? ', "You must give a valid name.", nameValidator);
-    // const personalPhone = await promptInput('Personal phone number ? ', "Invalid phone number.", (number)=> {
-    //     const regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    //     return regex.test(number)
-    // })
-    let address = undefined
 
+    let address = undefined
     do {
         try {
             const postalCode = await promptInput('What is the customer postal code? ', "Invalid postal code. Please enter exactly 8 digits.", postalCodeValidator);
