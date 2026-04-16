@@ -2,12 +2,32 @@ import readline from 'node:readline/promises';
 import {stdin, stdout} from 'node:process';
 import axios from "axios";
 import {v1 as uuidv4} from 'uuid';
+import postalCodeValidator from "./util/validation/postalCodeValidator.js";
 
 const input = stdin;
 const output = stdout;
 const rl = readline.createInterface({input, output});
 
 const customers = [];
+
+async function promptInput(questionMessage, rl, validatorCallback) {
+    while (true) {
+        try {
+            const data = await rl.question(questionMessage)
+            const {passed, message} = await validatorCallback(data)
+
+            if (!passed) {
+                console.log(message)
+                await rl.question("Press 'Enter' to retry...")
+            } else {
+                return data
+            }
+        } catch (error) {
+            console.error(error.message)
+            await rl.question("Press 'Enter' to retry...")
+        }
+    }
+}
 
 async function getAddress(postalCode) {
     /*
@@ -33,19 +53,6 @@ async function listCustomers() {
     runMenu()
 }
 
-async function askForPostalCode() {
-    while (true) {
-        const input = await rl.question('What is the customer postal code? ');
-        const postalCode = input.replace(/\D/g, "");
-
-        if (postalCode.length === 8) {
-            return postalCode;
-        }
-
-        console.log('Invalid postal code. Please enter exactly 8 digits.');
-    }
-}
-
 async function startRegistration() {
     console.clear();
 
@@ -53,7 +60,7 @@ async function startRegistration() {
 
     const name = await rl.question('Which is the customer name ? ');
 
-    let postalCode = await askForPostalCode();
+    const postalCode = await promptInput('What is the customer postal code? ', rl, postalCodeValidator);
     const address = await getAddress(postalCode);
 
     customers.push({id, name, ...address});
