@@ -3,6 +3,7 @@ import {stdin, stdout} from 'node:process';
 import axios from "axios";
 import {v1 as uuidv4} from 'uuid';
 import postalCodeValidator from "./util/validation/postalCodeValidator.js";
+import {getAddressByPostalCode} from "./providers/brasilApiClient.js";
 
 const input = stdin;
 const output = stdout;
@@ -29,23 +30,6 @@ async function promptInput(questionMessage, rl, validatorCallback) {
     }
 }
 
-async function getAddress(postalCode) {
-    /*
-        {
-            "cep": "89010025",
-            "state": "SC",
-            "city": "Blumenau",
-            "neighborhood": "Centro",
-            "street": "Rua Doutor Luiz de Freitas Melro",
-            ...
-        }
-     */
-    const {data: {cep, state, city, neighborhood, street}} =
-        await axios.get(`https://brasilapi.com.br/api/cep/v2/${postalCode}`);
-
-    return {cep, state, city, neighborhood, street};
-}
-
 async function listCustomers() {
     console.clear();
     console.log(customers);
@@ -61,7 +45,7 @@ async function startRegistration() {
     const name = await rl.question('Which is the customer name ? ');
 
     const postalCode = await promptInput('What is the customer postal code? ', rl, postalCodeValidator);
-    const address = await getAddress(postalCode);
+    const address = await getAddressByPostalCode(postalCode);
 
     customers.push({id, name, ...address});
 
