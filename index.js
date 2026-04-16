@@ -11,17 +11,17 @@ const rl = readline.createInterface({input, output});
 
 const customers = [];
 
-async function promptInput(questionMessage, rl, validatorCallback) {
+async function promptInput(question, errorMessage, validatorCallback) {
+    let answer = undefined
     while (true) {
         try {
-            const data = await rl.question(questionMessage)
-            const {passed, message} = await validatorCallback(data)
+            answer = await rl.question(question)
 
-            if (!passed) {
-                console.log(message)
+            if (!validatorCallback(answer)) {
+                console.log(errorMessage)
                 await rl.question("Press 'Enter' to retry...")
             } else {
-                return data
+                return answer
             }
         } catch (error) {
             console.error(error.message)
@@ -42,9 +42,9 @@ async function startRegistration() {
 
     const id = uuidv4();
 
-    const name = await promptInput('Which is the customer name ? ', rl, nameValidator)
+    const name = await promptInput('Which is the customer name ? ', "You must give a valid name.", nameValidator)
 
-    const postalCode = await promptInput('What is the customer postal code? ', rl, postalCodeValidator);
+    const postalCode = await promptInput('What is the customer postal code? ', "Invalid postal code. Please enter exactly 8 digits.", postalCodeValidator);
     const address = await getAddressByPostalCode(postalCode);
 
     customers.push({id, name, ...address});
