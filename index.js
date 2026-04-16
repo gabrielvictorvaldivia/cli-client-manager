@@ -1,9 +1,9 @@
 import readline from 'node:readline/promises';
 import {stdin, stdout} from 'node:process';
-import axios from "axios";
 import {v1 as uuidv4} from 'uuid';
-import postalCodeValidator from "./util/validation/postalCodeValidator.js";
 import {getAddressByPostalCode} from "./providers/brasilApiClient.js";
+import postalCodeValidator from "./util/validation/postalCodeValidator.js";
+import nameValidator from "./util/validation/nameValidator.js";
 
 const input = stdin;
 const output = stdout;
@@ -42,7 +42,7 @@ async function startRegistration() {
 
     const id = uuidv4();
 
-    const name = await rl.question('Which is the customer name ? ');
+    const name = await promptInput('Which is the customer name ? ', rl, nameValidator)
 
     const postalCode = await promptInput('What is the customer postal code? ', rl, postalCodeValidator);
     const address = await getAddressByPostalCode(postalCode);
