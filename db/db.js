@@ -10,3 +10,7 @@ export function save(client) {
     console.log(`Client registered successfully.`);
     return id;
 }
+
+export function getAll() {
+    return customers;
+}

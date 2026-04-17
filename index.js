@@ -4,7 +4,7 @@ import {v1 as uuidv4} from 'uuid';
 import {getAddressByPostalCode} from "./providers/brasilApiClient.js";
 import postalCodeValidator from "./util/validation/postalCodeValidator.js";
 import nameValidator from "./util/validation/nameValidator.js";
-import registerClient from './services/clientService.js'
+import {registerClient, listClients} from './services/clientService.js'
 
 const input = stdin;
 const output = stdout;
@@ -33,15 +33,8 @@ async function listCustomers() {
     console.clear();
     console.log("Registered clients:\n");
 
-    const formatCep = (cep) =>
-        cep.replace(/^(\d{5})(\d{3})$/, "$1-$2");
+    listClients();
 
-    for (let i = 0; i < customers.length; i++) {
-        const customer = customers[i];
-        const address = `${customer.street}, ${customer.neighborhood}, ${customer.city} - ${customer.state}, CEP: ${formatCep(customer.cep)}`;
-
-        console.log(`${customer.name} | ${address}`)
-    }
     console.log("\n")
     await rl.question("Press 'Enter' to return...")
     runMenu()
@@ -49,7 +42,6 @@ async function listCustomers() {
 
 async function startRegistration() {
     console.clear();
-
 
     const name = await promptInput('Which is the customer name ? ', "You must give a valid name.", nameValidator);
 
@@ -63,7 +55,7 @@ async function startRegistration() {
         }
     } while (!address)
 
-    const id = registerClient({name, address})
+    const id = registerClient({name, ...address})
 
     await rl.question("Press 'Enter' to continue...")
 
